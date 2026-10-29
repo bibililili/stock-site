@@ -78,6 +78,22 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
 .news time { color: var(--muted); font-size: 13px; padding-top: 2px; }
 .news .src { color: var(--muted); font-size: 12px; margin-left: 6px; white-space: nowrap; }
 .news .where { color: var(--muted); font-size: 13px; }
+
+/* 存档 */
+.mast h1 a.home { color: inherit; text-decoration: none; }
+.archive-note { margin: 14px 0 0; padding: 10px 14px; background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--link); border-radius: 6px; font-size: 14px; }
+.archive-note a { margin-left: 6px; }
+.archive h2 { font-size: 18px; margin: 32px 0 4px; }
+.archive .hint { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
+.archive-list { list-style: none; margin: 0; padding: 0; }
+.archive-list a { display: grid; grid-template-columns: 10.5em 1fr; gap: 0 12px; padding: 8px 0; border-bottom: 1px solid var(--rule); color: inherit; text-decoration: none; font-size: 15px; }
+.archive-list a:hover .what { text-decoration: underline; }
+.archive-list a[aria-current="page"] { font-weight: 650; }
+.archive-list .when { color: var(--muted); font-size: 13px; padding-top: 2px; }
+.show-all { margin-top: 10px; font: inherit; font-size: 14px; color: var(--link); background: none; border: 1px solid var(--rule); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+@media (max-width: 560px) {
+  .archive-list a { grid-template-columns: 1fr; }
+}
 .reports { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .reports li { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
 .reports .by { font-size: 12px; color: var(--muted); }
@@ -283,13 +299,16 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
 
 <script>
 (function () {
-  var data;
+  var inline;
   try {
-    data = JSON.parse(document.getElementById('market-data').textContent);
+    inline = JSON.parse(document.getElementById('market-data').textContent);
   } catch (e) {
     document.getElementById('app').innerHTML = '<p>行情数据格式有误，页面无法显示。请检查 market-data 数据块。</p>';
     return;
   }
+  var SNAP_RE = /^\d{4}-\d{2}-\d{2}-(pre|mid|close)$/;
+  var PHASE = {pre: '盘前', mid: '午间', close: '收盘后'};
+  var WEEK = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
   var SCALE = 5; // 涨跌幅条以 ±5% 为满格，两个市场共用同一刻度
 
@@ -309,10 +328,16 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   }
   function dir(n) { return n > 0 ? 'up' : n < 0 ? 'down' : ''; }
 
+  function render(data, snapId, notice) {
   var h = [];
-  h.push('<header class="mast"><h1>盘后指数<span>stock.asymptos.com</span></h1>' +
+  h.push('<header class="mast"><h1><a class="home" href="./">盘后指数</a><span>stock.asymptos.com</span></h1>' +
          '<div class="stamp">' + (data.phaseLabel ? '<span class="phase">' + esc(data.phaseLabel) + '</span>' : '') +
          '<span>更新于 <span class="num">' + esc(data.updated) + '</span></span></div></header>');
+  if (snapId) {
+    h.push('<p class="archive-note">你正在看 <b class="num">' + esc(snapLabel(snapId)) + '</b> 的存档。<a href="./">回到最新</a></p>');
+  } else if (notice) {
+    h.push('<p class="archive-note">' + esc(notice) + '</p>');
+  }
   h.push('<p class="lede">' + esc(data.headline) + '</p>');
   h.push('<p class="sub">' + esc(data.sub) + '</p>');
 
@@ -411,6 +436,8 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   });
   h.push('</tbody></table></div></section>');
 
+  h.push('<section class="archive" id="archive" hidden></section>');
+
   h.push('<footer><p>红色为涨、绿色为跌。涨跌幅条两个市场共用 ±5% 刻度，可以直接比较力度。</p>' +
          '<p>数据整理自公开财经资讯，可能存在误差，仅作个人研究记录，不构成投资建议。</p>');
   var flagged = [];
@@ -421,6 +448,54 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   h.push('</ul></footer>');
 
   document.getElementById('app').innerHTML = h.join('');
+  document.title = snapId ? '盘后指数 ' + snapLabel(snapId) : '盘后指数';
+  window.scrollTo(0, 0);
+  loadArchive(snapId);
+  }
+
+  function snapLabel(id) {
+    var d = id.slice(0, 10), p = id.slice(11);
+    var wd = new Date(d + 'T12:00:00+08:00').getDay();
+    return Number(d.slice(5, 7)) + '月' + Number(d.slice(8, 10)) + '日 ' + WEEK[wd] + ' ' + (PHASE[p] || p);
+  }
+
+  // 往期记录：读取 archive/index.json，列出全部存档
+  function loadArchive(current) {
+    var box = document.getElementById('archive');
+    fetch('archive/index.json', {cache: 'no-cache'})
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (list) {
+        list = (list || []).filter(function (e) { return e && SNAP_RE.test(e.id); });
+        if (!list.length) return;
+        var LIMIT = 15;
+        var rows = list.map(function (e, i) {
+          var cur = e.id === current ? ' aria-current="page"' : '';
+          return '<li' + (i >= LIMIT ? ' class="more" hidden' : '') + '><a href="?d=' + esc(e.id) + '"' + cur + '>' +
+            '<span class="when num">' + esc(snapLabel(e.id)) + '</span><span class="what">' + esc(e.headline || '') + '</span></a></li>';
+        });
+        box.innerHTML = '<h2>往期记录</h2><p class="hint">共 ' + list.length + ' 份存档，每次更新都会自动保存一份，点开可以看当时的完整页面。</p>' +
+          '<ul class="archive-list">' + rows.join('') + '</ul>' +
+          (list.length > LIMIT ? '<button type="button" class="show-all">显示全部 ' + list.length + ' 份</button>' : '');
+        box.hidden = false;
+        var btn = box.querySelector('.show-all');
+        if (btn) btn.addEventListener('click', function () {
+          box.querySelectorAll('li.more').forEach(function (li) { li.hidden = false; });
+          btn.remove();
+        });
+      })
+      .catch(function () { box.hidden = true; });
+  }
+
+  // 链接带 ?d=YYYY-MM-DD-phase 时打开对应存档，否则显示最新数据
+  var want = new URLSearchParams(location.search).get('d');
+  if (want && SNAP_RE.test(want)) {
+    fetch('archive/' + want + '.json', {cache: 'no-cache'})
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) { render(d, want); })
+      .catch(function () { render(inline, null, '没有找到这份存档，下面显示的是最新数据。'); });
+  } else {
+    render(inline, null);
+  }
 })();
 </script>
 </body>
