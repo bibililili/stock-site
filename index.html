@@ -135,6 +135,7 @@ section.mkt { background: var(--sheet); border: 1px solid var(--rule); border-ra
 .hist-table th:first-child, .hist-table td:first-child { text-align: left; }
 .hist-table thead th { color: var(--muted); font-weight: 500; font-size: 13px; }
 .hist-scroll { overflow-x: auto; }
+.spark { display: block; margin-left: auto; }
 
 footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px; }
 footer p { margin: 0 0 8px; }
@@ -318,11 +319,29 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
 
   // 历史收盘：每天自动追加一列
   var hs = data.history;
-  h.push('<section class="hist"><h2>近几日收盘</h2><p class="hint">每个交易日自动追加一列，攒够一周后改成走势线。</p><div class="hist-scroll"><table class="hist-table num"><thead><tr><th>指数</th>');
+  var showSpark = hs.dates.length >= 5;
+  function spark(vals) {
+    var pts = [];
+    vals.forEach(function (v, i) { if (v !== null) pts.push([i, v]); });
+    if (pts.length < 2) return '';
+    var W = 84, H = 24, n = vals.length - 1;
+    var lo = Math.min.apply(null, pts.map(function (p) { return p[1]; }));
+    var hi = Math.max.apply(null, pts.map(function (p) { return p[1]; }));
+    var span = hi - lo || 1;
+    var path = pts.map(function (p) {
+      return (p[0] / n * (W - 4) + 2).toFixed(1) + ',' + (H - 2 - (p[1] - lo) / span * (H - 4)).toFixed(1);
+    }).join(' ');
+    var cls = dir(pts[pts.length - 1][1] - pts[0][1]);
+    return '<svg class="spark ' + cls + '" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><polyline points="' + path + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+  var hint = showSpark ? '最近 ' + hs.dates.length + ' 个交易日，走势线按区间首尾涨跌着色。' : '每个交易日自动追加一列，攒够 5 个交易日后显示走势线。';
+  h.push('<section class="hist"><h2>近几日收盘</h2><p class="hint">' + hint + '</p><div class="hist-scroll"><table class="hist-table num"><thead><tr><th>指数</th>');
+  if (showSpark) h.push('<th>走势</th>');
   hs.dates.forEach(function (d) { h.push('<th>' + esc(d) + '</th>'); });
   h.push('</tr></thead><tbody>');
   hs.rows.forEach(function (r) {
     h.push('<tr><td>' + esc(r.name) + '</td>');
+    if (showSpark) h.push('<td>' + spark(r.v) + '</td>');
     r.v.forEach(function (v, i) {
       var prev = i > 0 ? r.v[i - 1] : null;
       var cls = (v !== null && prev !== null) ? dir(v - prev) : '';
