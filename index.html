@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>盘后指数</title>
+<meta name="description" content="A股与美股主要股指盘后追踪">
+<style>
+:root {
+  --paper: #f2f4f6;
+  --sheet: #ffffff;
+  --ink: #18202a;
+  --muted: #5d6a77;
+  --rule: #d7dde3;
+  --track: #e6eaee;
+  --up: #c4352b;
+  --down: #12845a;
+  --link: #2c4a9a;
+  --note-bg: #f7f8fa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141a21;
+    --sheet: #1b232c;
+    --ink: #e4e9ee;
+    --muted: #93a0ad;
+    --rule: #2c3743;
+    --track: #26303b;
+    --up: #ff6a5c;
+    --down: #3cc58c;
+    --link: #8fa8ee;
+    --note-bg: #18202a;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141a21;
+  --sheet: #1b232c;
+  --ink: #e4e9ee;
+  --muted: #93a0ad;
+  --rule: #2c3743;
+  --track: #26303b;
+  --up: #ff6a5c;
+  --down: #3cc58c;
+  --link: #8fa8ee;
+  --note-bg: #18202a;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 3px; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 28px 16px 56px; }
+
+/* masthead */
+.mast { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.mast h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+.mast h1 span { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.mast .stamp { font-size: 13px; color: var(--muted); }
+
+.lede { margin: 22px 0 6px; font-size: clamp(22px, 5.4vw, 30px); line-height: 1.35; font-weight: 650; letter-spacing: -0.005em; }
+.sub { margin: 0 0 28px; color: var(--muted); font-size: 15px; }
+
+/* overnight sequence: the one memorable element */
+.seq { position: relative; margin: 0 0 36px; padding: 0; list-style: none; }
+.seq::before { content: ""; position: absolute; left: 52px; top: 8px; bottom: 8px; width: 2px; background: var(--rule); }
+.seq li { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 0 22px; padding: 7px 0; }
+.seq time { font-size: 14px; color: var(--muted); text-align: right; padding-top: 1px; }
+.seq li::after { content: ""; position: absolute; left: 48px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--sheet); border: 2px solid var(--muted); }
+.seq li.us::after { border-color: var(--link); }
+.seq li.cn::after { border-color: var(--ink); }
+.seq li.hit::after { background: var(--down); border-color: var(--down); }
+.seq p { margin: 0; font-size: 15px; }
+.seq .where { color: var(--muted); font-size: 13px; margin-right: 6px; }
+
+/* market blocks */
+section.mkt { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 20px 18px 8px; margin-bottom: 20px; }
+.mkt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.mkt-head h2 { margin: 0; font-size: 20px; font-weight: 650; }
+.mkt-head .when { font-size: 13px; color: var(--muted); }
+
+.scale { display: grid; grid-template-columns: 1fr var(--barw); font-size: 12px; color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--rule); }
+.scale .ticks { display: flex; justify-content: space-between; }
+:root { --barw: 200px; }
+
+.row { display: grid; grid-template-columns: 1fr auto auto var(--barw); align-items: center; gap: 0 16px; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+.row:last-of-type { border-bottom: 0; }
+.row .name { font-weight: 600; font-size: 16px; }
+.row .name small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.row .close { font-size: 17px; text-align: right; }
+.row .close sup { color: var(--muted); font-size: 11px; margin-left: 1px; }
+.row .chg { text-align: right; min-width: 5.6em; }
+.row .chg b { display: block; font-size: 16px; font-weight: 650; }
+.row .chg i { font-style: normal; font-size: 12px; }
+.up { color: var(--up); }
+.down { color: var(--down); }
+
+.bar { position: relative; height: 10px; background: var(--track); border-radius: 2px; }
+.bar::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--muted); }
+.bar span { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
+.bar span.up { background: var(--up); left: 50%; }
+.bar span.down { background: var(--down); right: 50%; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0 6px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.stat .k { font-size: 13px; color: var(--muted); }
+.stat .v { font-size: 18px; font-weight: 650; }
+.stat .n { font-size: 13px; color: var(--muted); }
+.breadth { display: flex; height: 8px; border-radius: 2px; overflow: hidden; margin-top: 6px; background: var(--track); }
+.breadth .u { background: var(--up); }
+.breadth .d { background: var(--down); }
+
+.notes { margin: 14px -18px 0; padding: 14px 18px 16px; background: var(--note-bg); border-top: 1px solid var(--rule); border-radius: 0 0 10px 10px; }
+.notes ul { margin: 0; padding-left: 1.1em; }
+.notes li { margin: 5px 0; font-size: 15px; }
+.notes li::marker { color: var(--muted); }
+
+.link-box { margin: 28px 0; }
+.link-box h2 { font-size: 18px; margin: 0 0 8px; }
+.link-box p { margin: 0 0 10px; max-width: 40em; }
+.watch { color: var(--muted); font-size: 15px; }
+
+.hist h2 { font-size: 18px; margin: 32px 0 8px; }
+.hist .hint { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.hist-table th, .hist-table td { text-align: right; padding: 7px 6px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.hist-table th:first-child, .hist-table td:first-child { text-align: left; }
+.hist-table thead th { color: var(--muted); font-weight: 500; font-size: 13px; }
+.hist-scroll { overflow-x: auto; }
+
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px; }
+footer p { margin: 0 0 8px; }
+footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
+
+@media (max-width: 560px) {
+  :root { --barw: 100%; }
+  section.mkt { padding: 16px 14px 6px; }
+  .notes { margin: 12px -14px 0; padding: 12px 14px 14px; }
+  .scale { display: none; }
+  .row { grid-template-columns: 1fr auto auto; gap: 6px 14px; }
+  .row .bar { grid-column: 1 / -1; height: 6px; }
+  .seq::before { left: 46px; }
+  .seq li { grid-template-columns: 38px 1fr; gap: 0 20px; }
+  .seq li::after { left: 42px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bar span { transition: width .6s ease-out; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <noscript>此页面需要启用 JavaScript 才能显示行情数据。</noscript>
+</div>
+
+<!-- 每日定时任务只替换下面这段数据，页面结构保持不变 -->
+<script id="market-data" type="application/json">
+{
+  "updated": "2026-10-29 18:00",
+  "headline": "美股收涨，谷歌盘后暴跌；A股算力硬件承压，双创跌逾 4%",
+  "sub": "A股 10月29日（周四）收盘，美股 10月28日（周三）收盘，即北京时间今晨 4 点。",
+  "sequence": [
+    {"t": "02:00", "mkt": "us", "text": "美联储宣布维持利率 3.75%–4.00% 不变，主席沃什称通胀仍偏高"},
+    {"t": "04:00", "mkt": "us", "text": "美股收盘：三大指数小幅收涨，费城半导体指数四连涨"},
+    {"t": "盘后", "mkt": "us", "hit": true, "text": "Alphabet 营收和利润均不及预期，盘后跌超 9%；微软云业务超预期，盘后涨近 3%"},
+    {"t": "09:30", "mkt": "cn", "text": "A股集体低开：沪指低开 0.13%，创业板指低开 1.46%"},
+    {"t": "11:30", "mkt": "cn", "text": "午盘：创业板指跌 3.63%，科创50 跌 4.21%，超 4700 只个股下跌"},
+    {"t": "15:00", "mkt": "cn", "hit": true, "text": "收盘：创业板指跌 4.45%、科创50 跌 4.27%，双双刷新阶段新低"}
+  ],
+  "markets": [
+    {
+      "id": "cn",
+      "name": "A股",
+      "when": "10月29日 周四 15:00 收盘",
+      "indices": [
+        {"name": "上证指数", "code": "000001", "close": 3651.43, "chg": -30.04, "pct": -0.82},
+        {"name": "深证成指", "code": "399001", "close": 11138.20, "chg": -334.98, "pct": -2.92},
+        {"name": "沪深300", "code": "000300", "close": 4041.84, "chg": -42.03, "pct": -1.03},
+        {"name": "创业板指", "code": "399006", "close": 2517.59, "chg": -117.17, "pct": -4.45},
+        {"name": "科创50", "code": "000688", "close": 1228.09, "chg": -54.84, "pct": -4.27}
+      ],
+      "stats": {
+        "turnover": {"label": "沪深两市成交额", "value": "1.56 万亿", "note": "较前一日缩量约 720 亿"},
+        "breadth": {"label": "涨跌家数", "up": 781, "down": 4728}
+      },
+      "notes": [
+        "双创领跌：创业板指、科创50 均跌超 4%，收盘点位刷新这轮调整的新低。",
+        "AI 硬件集体回调：PCB、CPO、存储芯片跌幅居前，天孚通信跌超 19%。隔夜谷歌、三星业绩不及预期是直接导火索。",
+        "红利逆势走强：银行、煤炭上涨，工行、建行涨超 2% 创历史新高，四大行 A+H 总市值首次站上 10 万亿元。",
+        "券商走弱，中金公司跌停。"
+      ]
+    },
+    {
+      "id": "us",
+      "name": "美股",
+      "when": "10月28日 周三收盘（北京时间今晨 4:00）",
+      "indices": [
+        {"name": "道琼斯", "code": "DJI", "close": 52475.10, "chg": 97.53, "pct": 0.19},
+        {"name": "标普500", "code": "SPX", "close": 7743.98, "chg": 21.38, "pct": 0.28},
+        {"name": "纳斯达克", "code": "IXIC", "close": 26549.85, "chg": 72.04, "pct": 0.27},
+        {"name": "费城半导体", "code": "SOX", "close": 11674, "chg": null, "pct": 1.75, "flag": "点位与涨幅来自不同来源，略有出入"}
+      ],
+      "stats": null,
+      "notes": [
+        "美联储按兵不动，但主席沃什强调通胀仍偏高，并宣布 2027–2028 年起逐步减少议息会议次数；市场仍押注 12 月加息。",
+        "半导体继续领涨：SK海力士三季度业绩超预期涨超 13%，美光、应用材料涨超 5%；甲骨文因乐观的长期规划涨超 10%。",
+        "七巨头分化：谷歌涨 1.70% 领涨，英伟达、Meta 跌超 1%。",
+        "收盘后风向突变：Alphabet 财报不及预期、自由现金流转负，盘后跌超 9%；微软盘后涨近 3%。"
+      ]
+    }
+  ],
+  "linkage": "今天两个市场讲的是同一个故事的两半。美股常规时段里，芯片和存储还在上攻；收盘后谷歌财报让「AI 投入能不能变现」的疑问重新冒头，A股开盘就把这份担忧直接算进了 PCB、CPO 和存储链条，资金则躲进银行等高股息板块。",
+  "watch": "今晚要看：谷歌盘后的跌幅进入美股常规时段后，会不会扩散到整条 AI 链。",
+  "history": {
+    "dates": ["10-27", "10-28", "10-29"],
+    "rows": [
+      {"name": "上证指数", "mkt": "cn", "v": [null, 3681.47, 3651.43]},
+      {"name": "创业板指", "mkt": "cn", "v": [null, 2634.76, 2517.59]},
+      {"name": "科创50", "mkt": "cn", "v": [1252.28, 1282.93, 1228.09]},
+      {"name": "道琼斯", "mkt": "us", "v": [52377.57, 52475.10, null]},
+      {"name": "标普500", "mkt": "us", "v": [7722.60, 7743.98, null]},
+      {"name": "纳斯达克", "mkt": "us", "v": [26477.81, 26549.85, null]}
+    ]
+  },
+  "sources": [
+    {"name": "21经济网：A股收评", "url": "https://www.21jingji.com/article/20261029/herald/9bc35ecb8df7a3c78c178185ddc0cd8b.html"},
+    {"name": "FX168：A股主要指数收盘速递", "url": "https://www.fx168news.com/express/fastnews/1457968"},
+    {"name": "FX168：A股收评", "url": "https://www.fx168news.com/article/1109656"},
+    {"name": "FX168：美股三大指数收盘速递", "url": "https://www.fx168news.com/express/fastnews/1457667"},
+    {"name": "FX168：美股财报夜", "url": "https://www.fx168news.com/article/1109404"},
+    {"name": "东方财富：美联储维持利率不变", "url": "https://finance.eastmoney.com/a/202610293912816762.html"},
+    {"name": "TradingKey：美股收盘", "url": "https://tradingkey.com/zh-hans/analysis/stocks/us-stock/262249001-us-stock-market-close-oracle-sk-hynix-fed-hold-sox-tradingkey"}
+  ]
+}
+</script>
+
+<script>
+(function () {
+  var data;
+  try {
+    data = JSON.parse(document.getElementById('market-data').textContent);
+  } catch (e) {
+    document.getElementById('app').innerHTML = '<p>行情数据格式有误，页面无法显示。请检查 market-data 数据块。</p>';
+    return;
+  }
+
+  var SCALE = 5; // 涨跌幅条以 ±5% 为满格，两个市场共用同一刻度
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c];
+    });
+  }
+  function fmt(n, d) {
+    if (n === null || n === undefined) return '—';
+    return Number(n).toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
+  }
+  function signed(n, d) {
+    if (n === null || n === undefined) return '';
+    var s = fmt(Math.abs(n), d);
+    return (n > 0 ? '+' : n < 0 ? '−' : '') + s;
+  }
+  function dir(n) { return n > 0 ? 'up' : n < 0 ? 'down' : ''; }
+
+  var h = [];
+  h.push('<header class="mast"><h1>盘后指数<span>stock.asymptos.com</span></h1>' +
+         '<div class="stamp">更新于 <span class="num">' + esc(data.updated) + '</span></div></header>');
+  h.push('<p class="lede">' + esc(data.headline) + '</p>');
+  h.push('<p class="sub">' + esc(data.sub) + '</p>');
+
+  // 隔夜到收盘的时间线
+  h.push('<ol class="seq" aria-label="北京时间事件顺序">');
+  data.sequence.forEach(function (s) {
+    var cls = s.mkt + (s.hit ? ' hit' : '');
+    h.push('<li class="' + cls + '"><time class="num">' + esc(s.t) + '</time><p><span class="where">' +
+           (s.mkt === 'us' ? '美股' : 'A股') + '</span>' + esc(s.text) + '</p></li>');
+  });
+  h.push('</ol>');
+
+  data.markets.forEach(function (m) {
+    h.push('<section class="mkt" aria-labelledby="h-' + m.id + '">');
+    h.push('<div class="mkt-head"><h2 id="h-' + m.id + '">' + esc(m.name) + '</h2><span class="when">' + esc(m.when) + '</span></div>');
+    h.push('<div class="scale" aria-hidden="true"><span></span><span class="ticks"><span>−5%</span><span>0</span><span>+5%</span></span></div>');
+    m.indices.forEach(function (ix) {
+      var d = dir(ix.pct);
+      var w = Math.min(Math.abs(ix.pct) / SCALE, 1) * 50;
+      var flag = ix.flag ? '<sup title="' + esc(ix.flag) + '">*</sup>' : '';
+      h.push('<div class="row">' +
+        '<div class="name">' + esc(ix.name) + '<small class="num">' + esc(ix.code) + '</small></div>' +
+        '<div class="close num">' + fmt(ix.close, ix.close % 1 === 0 && ix.flag ? 0 : 2) + flag + '</div>' +
+        '<div class="chg num ' + d + '"><b>' + signed(ix.pct, 2) + '%</b><i>' + (ix.chg === null ? '&nbsp;' : signed(ix.chg, 2)) + '</i></div>' +
+        '<div class="bar" role="img" aria-label="' + esc(ix.name) + ' 涨跌幅 ' + signed(ix.pct, 2) + '%"><span class="' + d + '" style="width:' + w.toFixed(1) + '%"></span></div>' +
+        '</div>');
+    });
+    if (m.stats) {
+      var b = m.stats.breadth, t = m.stats.turnover;
+      var tot = b.up + b.down;
+      h.push('<div class="stats">' +
+        '<div class="stat"><div class="k">' + esc(t.label) + '</div><div class="v num">' + esc(t.value) + '</div><div class="n">' + esc(t.note) + '</div></div>' +
+        '<div class="stat"><div class="k">' + esc(b.label) + '</div><div class="v num"><span class="up">' + b.up + '</span> / <span class="down">' + b.down + '</span></div>' +
+        '<div class="breadth" role="img" aria-label="上涨 ' + b.up + ' 家，下跌 ' + b.down + ' 家"><span class="u" style="width:' + (b.up / tot * 100).toFixed(1) + '%"></span><span class="d" style="width:' + (b.down / tot * 100).toFixed(1) + '%"></span></div></div>' +
+        '</div>');
+    }
+    h.push('<div class="notes"><ul>');
+    m.notes.forEach(function (n) { h.push('<li>' + esc(n) + '</li>'); });
+    h.push('</ul></div></section>');
+  });
+
+  h.push('<section class="link-box"><h2>两个市场怎么连起来</h2><p>' + esc(data.linkage) + '</p><p class="watch">' + esc(data.watch) + '</p></section>');
+
+  // 历史收盘：每天自动追加一列
+  var hs = data.history;
+  h.push('<section class="hist"><h2>近几日收盘</h2><p class="hint">每个交易日自动追加一列，攒够一周后改成走势线。</p><div class="hist-scroll"><table class="hist-table num"><thead><tr><th>指数</th>');
+  hs.dates.forEach(function (d) { h.push('<th>' + esc(d) + '</th>'); });
+  h.push('</tr></thead><tbody>');
+  hs.rows.forEach(function (r) {
+    h.push('<tr><td>' + esc(r.name) + '</td>');
+    r.v.forEach(function (v, i) {
+      var prev = i > 0 ? r.v[i - 1] : null;
+      var cls = (v !== null && prev !== null) ? dir(v - prev) : '';
+      h.push('<td class="' + cls + '">' + fmt(v, 2) + '</td>');
+    });
+    h.push('</tr>');
+  });
+  h.push('</tbody></table></div></section>');
+
+  h.push('<footer><p>红色为涨、绿色为跌。涨跌幅条两个市场共用 ±5% 刻度，可以直接比较力度。</p>' +
+         '<p>数据整理自公开财经资讯，可能存在误差，仅作个人研究记录，不构成投资建议。</p>');
+  var flagged = [];
+  data.markets.forEach(function (m) { m.indices.forEach(function (ix) { if (ix.flag) flagged.push(ix.name + '：' + ix.flag); }); });
+  if (flagged.length) h.push('<p>* ' + flagged.map(esc).join('；') + '</p>');
+  h.push('<p>今日来源：</p><ul>');
+  data.sources.forEach(function (s) { h.push('<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.name) + '</a></li>'); });
+  h.push('</ul></footer>');
+
+  document.getElementById('app').innerHTML = h.join('');
+})();
+</script>
+</body>
+</html>
