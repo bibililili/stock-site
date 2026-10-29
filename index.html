@@ -65,7 +65,25 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
 .mast { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .mast h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
 .mast h1 span { color: var(--muted); font-weight: 400; margin-left: 6px; }
-.mast .stamp { font-size: 13px; color: var(--muted); }
+.mast .stamp { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.phase { font-size: 12px; color: var(--ink); border: 1px solid var(--rule); border-radius: 999px; padding: 0 9px; line-height: 20px; background: var(--sheet); }
+
+/* 快讯与研报 */
+.feed { margin: 28px 0 0; }
+.feed h2 { font-size: 18px; margin: 0 0 4px; }
+.feed .hint { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
+.news { list-style: none; margin: 0; padding: 0; }
+.news li { display: grid; grid-template-columns: 6.2em 1fr; gap: 0 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.news li:last-child { border-bottom: 0; }
+.news time { color: var(--muted); font-size: 13px; padding-top: 2px; }
+.news .src { color: var(--muted); font-size: 12px; margin-left: 6px; white-space: nowrap; }
+.news .where { color: var(--muted); font-size: 13px; }
+.reports { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.reports li { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
+.reports .by { font-size: 12px; color: var(--muted); }
+.reports h3 { margin: 2px 0 4px; font-size: 16px; font-weight: 650; }
+.reports p { margin: 0; font-size: 15px; }
+.reports .stance { display: inline-block; font-size: 12px; border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; margin-left: 6px; color: var(--muted); font-weight: 400; vertical-align: 1px; }
 
 .lede { margin: 22px 0 6px; font-size: clamp(22px, 5.4vw, 30px); line-height: 1.35; font-weight: 650; letter-spacing: -0.005em; }
 .sub { margin: 0 0 28px; color: var(--muted); font-size: 15px; }
@@ -151,6 +169,7 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   .seq::before { left: 46px; }
   .seq li { grid-template-columns: 38px 1fr; gap: 0 20px; }
   .seq li::after { left: 42px; }
+  .news li { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .bar span { transition: width .6s ease-out; }
@@ -165,9 +184,11 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
 <!-- 每日定时任务只替换下面这段数据，页面结构保持不变 -->
 <script id="market-data" type="application/json">
 {
-  "updated": "2026-10-29 18:00",
+  "updated": "2026-10-30 01:05",
+  "phase": "close",
+  "phaseLabel": "收盘后",
   "headline": "美股收涨，谷歌盘后暴跌；A股算力硬件承压，双创跌逾 4%",
-  "sub": "A股 10月29日（周四）收盘，美股 10月28日（周三）收盘，即北京时间今晨 4 点。",
+  "sub": "A股 10月29日（周四）收盘；美股 10月28日（周三）收盘，即北京时间 10月29日 4:00。",
   "sequence": [
     {"t": "02:00", "mkt": "us", "text": "美联储宣布维持利率 3.75%–4.00% 不变，主席沃什称通胀仍偏高"},
     {"t": "04:00", "mkt": "us", "text": "美股收盘：三大指数小幅收涨，费城半导体指数四连涨"},
@@ -202,7 +223,7 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
     {
       "id": "us",
       "name": "美股",
-      "when": "10月28日 周三收盘（北京时间今晨 4:00）",
+      "when": "10月28日 周三收盘（北京时间 10月29日 4:00）",
       "indices": [
         {"name": "道琼斯", "code": "DJI", "close": 52475.10, "chg": 97.53, "pct": 0.19},
         {"name": "标普500", "code": "SPX", "close": 7743.98, "chg": 21.38, "pct": 0.28},
@@ -220,6 +241,21 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   ],
   "linkage": "今天两个市场讲的是同一个故事的两半。美股常规时段里，芯片和存储还在上攻；收盘后谷歌财报让「AI 投入能不能变现」的疑问重新冒头，A股开盘就把这份担忧直接算进了 PCB、CPO 和存储链条，资金则躲进银行等高股息板块。",
   "watch": "今晚要看：谷歌盘后的跌幅进入美股常规时段后，会不会扩散到整条 AI 链。",
+  "news": [
+    {"t": "10-29 晚间", "mkt": "cn", "text": "华虹宏力、中微公司同日提议回购股份，合计回购金额上限 10 亿元。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
+    {"t": "10-29 晚间", "mkt": "cn", "text": "新易盛三季度营收 109.4 亿元、同比增长约 80%，净利润 38.4 亿元但环比下滑约 19%；当天股价跌 11%。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
+    {"t": "10-29 晚间", "mkt": "cn", "text": "中国石化前三季度净利润约 390 亿元，同比增长 30%，第三季度单季增长 57%，A、H 股回购仍在进行。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
+    {"t": "10-29 盘后", "mkt": "cn", "text": "联讯仪器三季报：前三季度营收 40.4 亿元，同比增长约 4 倍，第三季度净利润同比增长超 30 倍。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
+    {"t": "10-29 07:30", "mkt": "us", "text": "Alphabet 三季度每股收益 2.12 美元，远低于预期的 2.99 美元，自由现金流连续两个季度为负；谷歌云收入 307 亿美元好于预期。盘后一度跌超 11%。", "source": "网易", "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"},
+    {"t": "10-29 盘后", "mkt": "us", "text": "微软营收同比增长 19%，Azure 增长 48%，均好于市场预期，盘后涨近 3%。", "source": "网易", "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"}
+  ],
+  "reports": [
+    {"date": "10-28", "org": "华西证券", "author": "李立峰", "stance": "偏多", "title": "策略：成长股已经超跌", "summary": "认为这轮下跌主要是情绪和拥挤交易出清，并非基本面恶化；ETF 持续净流入，显示机构在逢低配置，市场处在筑底阶段。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
+    {"date": "10-28", "org": "东吴证券", "author": "陈刚", "stance": "偏多", "title": "策略：估值、仓位、情绪都出现底部信号", "summary": "沪深300 和创业板估值已处低位，波动率抬升后有望回归。反弹中看好高成长、低估值高回报和超跌的科技方向。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
+    {"date": "10-28", "org": "华福证券", "author": "任志强", "stance": "中性", "title": "盈利：三季报修复，高增长集中在 AI 链", "summary": "三季度营收和利润增速较好，主要由有色、电子、电力设备和基础化工贡献；预告高增长的公司集中在半导体、PCB、光芯片和 AI 算力。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
+    {"date": "10-28", "org": "海通国际", "author": "张忆东", "stance": "偏谨慎", "title": "配置：AI 基建周期接近尾声", "summary": "观点与多数券商不同：建议借秋季反弹调整组合，从 AI 基建转向优质安全资产，以及具有类债属性的成长价值资产。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
+    {"date": "10-29", "org": "券商评级汇总", "author": "", "stance": "", "title": "评级观察：223 家公司获推荐，5 次评级下调", "summary": "10月28日共 223 家公司获券商推荐，燕京啤酒、金徽酒、杭州银行各获 7 家推荐；华泰证券将金禾实业下调至增持，招商证券将隆盛科技下调至增持。", "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"}
+  ],
   "history": {
     "dates": ["10-27", "10-28", "10-29"],
     "rows": [
@@ -238,7 +274,9 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
     {"name": "FX168：美股三大指数收盘速递", "url": "https://www.fx168news.com/express/fastnews/1457667"},
     {"name": "FX168：美股财报夜", "url": "https://www.fx168news.com/article/1109404"},
     {"name": "东方财富：美联储维持利率不变", "url": "https://finance.eastmoney.com/a/202610293912816762.html"},
-    {"name": "TradingKey：美股收盘", "url": "https://tradingkey.com/zh-hans/analysis/stocks/us-stock/262249001-us-stock-market-close-oracle-sk-hynix-fed-hold-sox-tradingkey"}
+    {"name": "TradingKey：美股收盘", "url": "https://tradingkey.com/zh-hans/analysis/stocks/us-stock/262249001-us-stock-market-close-oracle-sk-hynix-fed-hold-sox-tradingkey"},
+    {"name": "新浪财经：多家券商首席研判", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
+    {"name": "21经济网：券商评级观察", "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"}
   ]
 }
 </script>
@@ -273,7 +311,8 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
 
   var h = [];
   h.push('<header class="mast"><h1>盘后指数<span>stock.asymptos.com</span></h1>' +
-         '<div class="stamp">更新于 <span class="num">' + esc(data.updated) + '</span></div></header>');
+         '<div class="stamp">' + (data.phaseLabel ? '<span class="phase">' + esc(data.phaseLabel) + '</span>' : '') +
+         '<span>更新于 <span class="num">' + esc(data.updated) + '</span></span></div></header>');
   h.push('<p class="lede">' + esc(data.headline) + '</p>');
   h.push('<p class="sub">' + esc(data.sub) + '</p>');
 
@@ -316,6 +355,27 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   });
 
   h.push('<section class="link-box"><h2>两个市场怎么连起来</h2><p>' + esc(data.linkage) + '</p><p class="watch">' + esc(data.watch) + '</p></section>');
+
+  // 最新快讯
+  if (data.news && data.news.length) {
+    h.push('<section class="feed"><h2>最新快讯</h2><ul class="news">');
+    data.news.forEach(function (n) {
+      h.push('<li><time class="num">' + esc(n.t) + '</time><div><span class="where">' + (n.mkt === 'us' ? '美股' : 'A股') + '</span> ' + esc(n.text) +
+        (n.url ? '<a class="src" href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.source || '来源') + '</a>' : '') + '</div></li>');
+    });
+    h.push('</ul></section>');
+  }
+
+  // 研报观点
+  if (data.reports && data.reports.length) {
+    h.push('<section class="feed"><h2>研报观点</h2><p class="hint">券商研究观点的摘要，不代表本页立场，也不构成投资建议。</p><ul class="reports">');
+    data.reports.forEach(function (r) {
+      var by = esc(r.date) + '　' + esc(r.org) + (r.author ? '　' + esc(r.author) : '');
+      h.push('<li><div class="by num">' + by + '</div><h3>' + esc(r.title) + (r.stance ? '<span class="stance">' + esc(r.stance) + '</span>' : '') + '</h3>' +
+        '<p>' + esc(r.summary) + (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener">来源</a>' : '') + '</p></li>');
+    });
+    h.push('</ul></section>');
+  }
 
   // 历史收盘：每天自动追加一列
   var hs = data.history;
