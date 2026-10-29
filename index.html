@@ -79,6 +79,27 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
 .news .src { color: var(--muted); font-size: 12px; margin-left: 6px; white-space: nowrap; }
 .news .where { color: var(--muted); font-size: 13px; }
 
+/* 接下来几小时：情景推演 */
+.outlook { margin: 28px 0 0; }
+.outlook h2 { font-size: 18px; margin: 0 0 4px; }
+.outlook .hint { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.ol-card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+.ol-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.ol-head h3 { margin: 0; font-size: 17px; }
+.ol-head .bias { font-size: 12px; border: 1px solid var(--rule); border-radius: 999px; padding: 0 9px; line-height: 20px; }
+.ol-head .bias.up { border-color: var(--up); }
+.ol-head .bias.down { border-color: var(--down); }
+.ol-head .horizon { font-size: 13px; color: var(--muted); }
+.ol-card p.now { margin: 0 0 10px; font-size: 15px; }
+.levels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 10px; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.levels .k { font-size: 12px; color: var(--muted); }
+.levels ul { margin: 2px 0 0; padding: 0; list-style: none; font-size: 15px; }
+.levels .res li { color: var(--up); }
+.levels .sup li { color: var(--down); }
+.ol-card .sub-h { font-size: 13px; color: var(--muted); margin: 8px 0 2px; }
+.ol-card ul.plain { margin: 0; padding-left: 1.1em; font-size: 15px; }
+.ol-card ul.plain li { margin: 3px 0; }
+
 /* 存档 */
 .mast h1 a.home { color: inherit; text-decoration: none; }
 .archive-note { margin: 14px 0 0; padding: 10px 14px; background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--link); border-radius: 6px; font-size: 14px; }
@@ -200,18 +221,44 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
 <!-- 每日定时任务只替换下面这段数据，页面结构保持不变 -->
 <script id="market-data" type="application/json">
 {
-  "updated": "2026-10-30 01:05",
+  "updated": "2026-10-30 01:35",
   "phase": "close",
   "phaseLabel": "收盘后",
   "headline": "美股收涨，谷歌盘后暴跌；A股算力硬件承压，双创跌逾 4%",
-  "sub": "A股 10月29日（周四）收盘；美股 10月28日（周三）收盘，即北京时间 10月29日 4:00。",
+  "sub": "A股 10月29日（周四）收盘；美股 10月28日（周三）收盘，即北京时间 10月29日 4:00；BTC 与黄金为各自标注时点的报价。",
   "sequence": [
-    {"t": "02:00", "mkt": "us", "text": "美联储宣布维持利率 3.75%–4.00% 不变，主席沃什称通胀仍偏高"},
-    {"t": "04:00", "mkt": "us", "text": "美股收盘：三大指数小幅收涨，费城半导体指数四连涨"},
-    {"t": "盘后", "mkt": "us", "hit": true, "text": "Alphabet 营收和利润均不及预期，盘后跌超 9%；微软云业务超预期，盘后涨近 3%"},
-    {"t": "09:30", "mkt": "cn", "text": "A股集体低开：沪指低开 0.13%，创业板指低开 1.46%"},
-    {"t": "11:30", "mkt": "cn", "text": "午盘：创业板指跌 3.63%，科创50 跌 4.21%，超 4700 只个股下跌"},
-    {"t": "15:00", "mkt": "cn", "hit": true, "text": "收盘：创业板指跌 4.45%、科创50 跌 4.27%，双双刷新阶段新低"}
+    {
+      "t": "02:00",
+      "mkt": "us",
+      "text": "美联储宣布维持利率 3.75%–4.00% 不变，主席沃什称通胀仍偏高"
+    },
+    {
+      "t": "04:00",
+      "mkt": "us",
+      "text": "美股收盘：三大指数小幅收涨，费城半导体指数四连涨"
+    },
+    {
+      "t": "盘后",
+      "mkt": "us",
+      "hit": true,
+      "text": "Alphabet 营收和利润均不及预期，盘后跌超 9%；微软云业务超预期，盘后涨近 3%"
+    },
+    {
+      "t": "09:30",
+      "mkt": "cn",
+      "text": "A股集体低开：沪指低开 0.13%，创业板指低开 1.46%"
+    },
+    {
+      "t": "11:30",
+      "mkt": "cn",
+      "text": "午盘：创业板指跌 3.63%，科创50 跌 4.21%，超 4700 只个股下跌"
+    },
+    {
+      "t": "15:00",
+      "mkt": "cn",
+      "hit": true,
+      "text": "收盘：创业板指跌 4.45%、科创50 跌 4.27%，双双刷新阶段新低"
+    }
   ],
   "markets": [
     {
@@ -219,15 +266,53 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
       "name": "A股",
       "when": "10月29日 周四 15:00 收盘",
       "indices": [
-        {"name": "上证指数", "code": "000001", "close": 3651.43, "chg": -30.04, "pct": -0.82},
-        {"name": "深证成指", "code": "399001", "close": 11138.20, "chg": -334.98, "pct": -2.92},
-        {"name": "沪深300", "code": "000300", "close": 4041.84, "chg": -42.03, "pct": -1.03},
-        {"name": "创业板指", "code": "399006", "close": 2517.59, "chg": -117.17, "pct": -4.45},
-        {"name": "科创50", "code": "000688", "close": 1228.09, "chg": -54.84, "pct": -4.27}
+        {
+          "name": "上证指数",
+          "code": "000001",
+          "close": 3651.43,
+          "chg": -30.04,
+          "pct": -0.82
+        },
+        {
+          "name": "深证成指",
+          "code": "399001",
+          "close": 11138.2,
+          "chg": -334.98,
+          "pct": -2.92
+        },
+        {
+          "name": "沪深300",
+          "code": "000300",
+          "close": 4041.84,
+          "chg": -42.03,
+          "pct": -1.03
+        },
+        {
+          "name": "创业板指",
+          "code": "399006",
+          "close": 2517.59,
+          "chg": -117.17,
+          "pct": -4.45
+        },
+        {
+          "name": "科创50",
+          "code": "000688",
+          "close": 1228.09,
+          "chg": -54.84,
+          "pct": -4.27
+        }
       ],
       "stats": {
-        "turnover": {"label": "沪深两市成交额", "value": "1.56 万亿", "note": "较前一日缩量约 720 亿"},
-        "breadth": {"label": "涨跌家数", "up": 781, "down": 4728}
+        "turnover": {
+          "label": "沪深两市成交额",
+          "value": "1.56 万亿",
+          "note": "较前一日缩量约 720 亿"
+        },
+        "breadth": {
+          "label": "涨跌家数",
+          "up": 781,
+          "down": 4728
+        }
       },
       "notes": [
         "双创领跌：创业板指、科创50 均跌超 4%，收盘点位刷新这轮调整的新低。",
@@ -241,10 +326,35 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
       "name": "美股",
       "when": "10月28日 周三收盘（北京时间 10月29日 4:00）",
       "indices": [
-        {"name": "道琼斯", "code": "DJI", "close": 52475.10, "chg": 97.53, "pct": 0.19},
-        {"name": "标普500", "code": "SPX", "close": 7743.98, "chg": 21.38, "pct": 0.28},
-        {"name": "纳斯达克", "code": "IXIC", "close": 26549.85, "chg": 72.04, "pct": 0.27},
-        {"name": "费城半导体", "code": "SOX", "close": 11674, "chg": null, "pct": 1.75, "flag": "点位与涨幅来自不同来源，略有出入"}
+        {
+          "name": "道琼斯",
+          "code": "DJI",
+          "close": 52475.1,
+          "chg": 97.53,
+          "pct": 0.19
+        },
+        {
+          "name": "标普500",
+          "code": "SPX",
+          "close": 7743.98,
+          "chg": 21.38,
+          "pct": 0.28
+        },
+        {
+          "name": "纳斯达克",
+          "code": "IXIC",
+          "close": 26549.85,
+          "chg": 72.04,
+          "pct": 0.27
+        },
+        {
+          "name": "费城半导体",
+          "code": "SOX",
+          "close": 11674,
+          "chg": null,
+          "pct": 1.75,
+          "flag": "点位与涨幅来自不同来源，略有出入"
+        }
       ],
       "stats": null,
       "notes": [
@@ -253,46 +363,299 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
         "七巨头分化：谷歌涨 1.70% 领涨，英伟达、Meta 跌超 1%。",
         "收盘后风向突变：Alphabet 财报不及预期、自由现金流转负，盘后跌超 9%；微软盘后涨近 3%。"
       ]
+    },
+    {
+      "id": "alt",
+      "name": "BTC 与黄金",
+      "when": "实时报价，时点见名称下方；BTC 为近 24 小时涨跌，黄金为日内涨跌",
+      "indices": [
+        {
+          "name": "比特币",
+          "code": "BTC/USD",
+          "asof": "10-30 01:20",
+          "close": 81260,
+          "chg": 484.65,
+          "pct": 0.6,
+          "flag": "24 小时交易的实时报价，各平台之间略有差异"
+        },
+        {
+          "name": "现货黄金",
+          "code": "XAU/USD",
+          "asof": "10-29 21:48",
+          "close": 4026.2,
+          "chg": -40.4,
+          "pct": -0.99
+        }
+      ],
+      "stats": null,
+      "notes": [
+        "比特币 10月29日亚洲时段一度跌破 8 万美元，最低约 7.98 万，全市场合约 24 小时爆仓约 3.56 亿美元，其中多头约 2.05 亿；随后收复 8 万。",
+        "拖累加密市场的是同一组因素：谷歌、三星财报不及预期打压科技股风险偏好，美联储偏鹰的按兵不动。",
+        "黄金被美国强劲数据压制：三季度 GDP 年化增长 3.4%，高于预期；9 月 PCE 同比升至 3.6%；10 年期美债收益率在 5% 附近。",
+        "利率期货显示 12 月加息 25 个基点的概率约 83%；金价已较 1 月约 5,599 美元的高点回落近 28%。"
+      ]
     }
   ],
   "linkage": "今天两个市场讲的是同一个故事的两半。美股常规时段里，芯片和存储还在上攻；收盘后谷歌财报让「AI 投入能不能变现」的疑问重新冒头，A股开盘就把这份担忧直接算进了 PCB、CPO 和存储链条，资金则躲进银行等高股息板块。",
   "watch": "今晚要看：谷歌盘后的跌幅进入美股常规时段后，会不会扩散到整条 AI 链。",
   "news": [
-    {"t": "10-29 晚间", "mkt": "cn", "text": "华虹宏力、中微公司同日提议回购股份，合计回购金额上限 10 亿元。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
-    {"t": "10-29 晚间", "mkt": "cn", "text": "新易盛三季度营收 109.4 亿元、同比增长约 80%，净利润 38.4 亿元但环比下滑约 19%；当天股价跌 11%。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
-    {"t": "10-29 晚间", "mkt": "cn", "text": "中国石化前三季度净利润约 390 亿元，同比增长 30%，第三季度单季增长 57%，A、H 股回购仍在进行。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
-    {"t": "10-29 盘后", "mkt": "cn", "text": "联讯仪器三季报：前三季度营收 40.4 亿元，同比增长约 4 倍，第三季度净利润同比增长超 30 倍。", "source": "新浪财经", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"},
-    {"t": "10-29 07:30", "mkt": "us", "text": "Alphabet 三季度每股收益 2.12 美元，远低于预期的 2.99 美元，自由现金流连续两个季度为负；谷歌云收入 307 亿美元好于预期。盘后一度跌超 11%。", "source": "网易", "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"},
-    {"t": "10-29 盘后", "mkt": "us", "text": "微软营收同比增长 19%，Azure 增长 48%，均好于市场预期，盘后涨近 3%。", "source": "网易", "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"}
+    {
+      "t": "10-29 晚间",
+      "mkt": "cn",
+      "text": "华虹宏力、中微公司同日提议回购股份，合计回购金额上限 10 亿元。",
+      "source": "新浪财经",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"
+    },
+    {
+      "t": "10-29 晚间",
+      "mkt": "cn",
+      "text": "新易盛三季度营收 109.4 亿元、同比增长约 80%，净利润 38.4 亿元但环比下滑约 19%；当天股价跌 11%。",
+      "source": "新浪财经",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"
+    },
+    {
+      "t": "10-29 晚间",
+      "mkt": "cn",
+      "text": "中国石化前三季度净利润约 390 亿元，同比增长 30%，第三季度单季增长 57%，A、H 股回购仍在进行。",
+      "source": "新浪财经",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"
+    },
+    {
+      "t": "10-29 盘后",
+      "mkt": "cn",
+      "text": "联讯仪器三季报：前三季度营收 40.4 亿元，同比增长约 4 倍，第三季度净利润同比增长超 30 倍。",
+      "source": "新浪财经",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxg2.html"
+    },
+    {
+      "t": "10-29 07:30",
+      "mkt": "us",
+      "text": "Alphabet 三季度每股收益 2.12 美元，远低于预期的 2.99 美元，自由现金流连续两个季度为负；谷歌云收入 307 亿美元好于预期。盘后一度跌超 11%。",
+      "source": "网易",
+      "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"
+    },
+    {
+      "t": "10-29 盘后",
+      "mkt": "us",
+      "text": "微软营收同比增长 19%，Azure 增长 48%，均好于市场预期，盘后涨近 3%。",
+      "source": "网易",
+      "url": "https://www.163.com/dy/article/LAD1K96K05199NPP.html"
+    }
   ],
   "reports": [
-    {"date": "10-28", "org": "华西证券", "author": "李立峰", "stance": "偏多", "title": "策略：成长股已经超跌", "summary": "认为这轮下跌主要是情绪和拥挤交易出清，并非基本面恶化；ETF 持续净流入，显示机构在逢低配置，市场处在筑底阶段。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
-    {"date": "10-28", "org": "东吴证券", "author": "陈刚", "stance": "偏多", "title": "策略：估值、仓位、情绪都出现底部信号", "summary": "沪深300 和创业板估值已处低位，波动率抬升后有望回归。反弹中看好高成长、低估值高回报和超跌的科技方向。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
-    {"date": "10-28", "org": "华福证券", "author": "任志强", "stance": "中性", "title": "盈利：三季报修复，高增长集中在 AI 链", "summary": "三季度营收和利润增速较好，主要由有色、电子、电力设备和基础化工贡献；预告高增长的公司集中在半导体、PCB、光芯片和 AI 算力。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
-    {"date": "10-28", "org": "海通国际", "author": "张忆东", "stance": "偏谨慎", "title": "配置：AI 基建周期接近尾声", "summary": "观点与多数券商不同：建议借秋季反弹调整组合，从 AI 基建转向优质安全资产，以及具有类债属性的成长价值资产。", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
-    {"date": "10-29", "org": "券商评级汇总", "author": "", "stance": "", "title": "评级观察：223 家公司获推荐，5 次评级下调", "summary": "10月28日共 223 家公司获券商推荐，燕京啤酒、金徽酒、杭州银行各获 7 家推荐；华泰证券将金禾实业下调至增持，招商证券将隆盛科技下调至增持。", "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"}
+    {
+      "date": "10-28",
+      "org": "华西证券",
+      "author": "李立峰",
+      "stance": "偏多",
+      "title": "策略：成长股已经超跌",
+      "summary": "认为这轮下跌主要是情绪和拥挤交易出清，并非基本面恶化；ETF 持续净流入，显示机构在逢低配置，市场处在筑底阶段。",
+      "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"
+    },
+    {
+      "date": "10-28",
+      "org": "东吴证券",
+      "author": "陈刚",
+      "stance": "偏多",
+      "title": "策略：估值、仓位、情绪都出现底部信号",
+      "summary": "沪深300 和创业板估值已处低位，波动率抬升后有望回归。反弹中看好高成长、低估值高回报和超跌的科技方向。",
+      "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"
+    },
+    {
+      "date": "10-28",
+      "org": "华福证券",
+      "author": "任志强",
+      "stance": "中性",
+      "title": "盈利：三季报修复，高增长集中在 AI 链",
+      "summary": "三季度营收和利润增速较好，主要由有色、电子、电力设备和基础化工贡献；预告高增长的公司集中在半导体、PCB、光芯片和 AI 算力。",
+      "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"
+    },
+    {
+      "date": "10-28",
+      "org": "海通国际",
+      "author": "张忆东",
+      "stance": "偏谨慎",
+      "title": "配置：AI 基建周期接近尾声",
+      "summary": "观点与多数券商不同：建议借秋季反弹调整组合，从 AI 基建转向优质安全资产，以及具有类债属性的成长价值资产。",
+      "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"
+    },
+    {
+      "date": "10-29",
+      "org": "券商评级汇总",
+      "author": "",
+      "stance": "",
+      "title": "评级观察：223 家公司获推荐，5 次评级下调",
+      "summary": "10月28日共 223 家公司获券商推荐，燕京啤酒、金徽酒、杭州银行各获 7 家推荐；华泰证券将金禾实业下调至增持，招商证券将隆盛科技下调至增持。",
+      "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"
+    }
   ],
   "history": {
-    "dates": ["10-27", "10-28", "10-29"],
+    "dates": [
+      "10-27",
+      "10-28",
+      "10-29"
+    ],
     "rows": [
-      {"name": "上证指数", "mkt": "cn", "v": [null, 3681.47, 3651.43]},
-      {"name": "创业板指", "mkt": "cn", "v": [null, 2634.76, 2517.59]},
-      {"name": "科创50", "mkt": "cn", "v": [1252.28, 1282.93, 1228.09]},
-      {"name": "道琼斯", "mkt": "us", "v": [52377.57, 52475.10, null]},
-      {"name": "标普500", "mkt": "us", "v": [7722.60, 7743.98, null]},
-      {"name": "纳斯达克", "mkt": "us", "v": [26477.81, 26549.85, null]}
+      {
+        "name": "上证指数",
+        "mkt": "cn",
+        "v": [
+          null,
+          3681.47,
+          3651.43
+        ]
+      },
+      {
+        "name": "创业板指",
+        "mkt": "cn",
+        "v": [
+          null,
+          2634.76,
+          2517.59
+        ]
+      },
+      {
+        "name": "科创50",
+        "mkt": "cn",
+        "v": [
+          1252.28,
+          1282.93,
+          1228.09
+        ]
+      },
+      {
+        "name": "道琼斯",
+        "mkt": "us",
+        "v": [
+          52377.57,
+          52475.1,
+          null
+        ]
+      },
+      {
+        "name": "标普500",
+        "mkt": "us",
+        "v": [
+          7722.6,
+          7743.98,
+          null
+        ]
+      },
+      {
+        "name": "纳斯达克",
+        "mkt": "us",
+        "v": [
+          26477.81,
+          26549.85,
+          null
+        ]
+      }
     ]
   },
   "sources": [
-    {"name": "21经济网：A股收评", "url": "https://www.21jingji.com/article/20261029/herald/9bc35ecb8df7a3c78c178185ddc0cd8b.html"},
-    {"name": "FX168：A股主要指数收盘速递", "url": "https://www.fx168news.com/express/fastnews/1457968"},
-    {"name": "FX168：A股收评", "url": "https://www.fx168news.com/article/1109656"},
-    {"name": "FX168：美股三大指数收盘速递", "url": "https://www.fx168news.com/express/fastnews/1457667"},
-    {"name": "FX168：美股财报夜", "url": "https://www.fx168news.com/article/1109404"},
-    {"name": "东方财富：美联储维持利率不变", "url": "https://finance.eastmoney.com/a/202610293912816762.html"},
-    {"name": "TradingKey：美股收盘", "url": "https://tradingkey.com/zh-hans/analysis/stocks/us-stock/262249001-us-stock-market-close-oracle-sk-hynix-fed-hold-sox-tradingkey"},
-    {"name": "新浪财经：多家券商首席研判", "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"},
-    {"name": "21经济网：券商评级观察", "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"}
+    {
+      "name": "21经济网：A股收评",
+      "url": "https://www.21jingji.com/article/20261029/herald/9bc35ecb8df7a3c78c178185ddc0cd8b.html"
+    },
+    {
+      "name": "FX168：A股主要指数收盘速递",
+      "url": "https://www.fx168news.com/express/fastnews/1457968"
+    },
+    {
+      "name": "FX168：A股收评",
+      "url": "https://www.fx168news.com/article/1109656"
+    },
+    {
+      "name": "FX168：美股三大指数收盘速递",
+      "url": "https://www.fx168news.com/express/fastnews/1457667"
+    },
+    {
+      "name": "FX168：美股财报夜",
+      "url": "https://www.fx168news.com/article/1109404"
+    },
+    {
+      "name": "东方财富：美联储维持利率不变",
+      "url": "https://finance.eastmoney.com/a/202610293912816762.html"
+    },
+    {
+      "name": "TradingKey：美股收盘",
+      "url": "https://tradingkey.com/zh-hans/analysis/stocks/us-stock/262249001-us-stock-market-close-oracle-sk-hynix-fed-hold-sox-tradingkey"
+    },
+    {
+      "name": "新浪财经：多家券商首席研判",
+      "url": "https://finance.sina.com.cn/stock/roll/2026-10-28/doc-iniwtpkh3463197.shtml"
+    },
+    {
+      "name": "21经济网：券商评级观察",
+      "url": "https://www.21jingji.com/article/20261029/herald/9f5eb19db4068d93cdcf165bc6a3b54c.html"
+    },
+    {
+      "name": "CoinDesk：比特币跌破 8 万美元",
+      "url": "https://coindesk.com/zh/markets/2026/10/29/bitcoin-dips-below-usd80-000-as-samsung-led-risk-aversion-in-tech-and-a-hawkish-fed-weigh-on-crypto"
+    },
+    {
+      "name": "CoinGlass：BTC 实时行情",
+      "url": "https://www.coinglass.com/zh/currencies/BTC"
+    },
+    {
+      "name": "Investing.com：GDP 与核心 PCE 走强，金价跌向 4000",
+      "url": "https://hk.investing.com/news/commodities-news/article-1727317"
+    },
+    {
+      "name": "新浪财经：10月29日黄金热点",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001908sxhq.html"
+    }
+  ],
+  "outlook": [
+    {
+      "asset": "比特币",
+      "bias": "震荡",
+      "horizon": "北京时间 10月30日凌晨至上午",
+      "now": "跌破 8 万后被买回，目前在 8.1 万上方，24 小时小幅上涨；多头杠杆刚被清洗过一轮，但谷歌财报带来的科技股压力还没完全消化。",
+      "levels": {
+        "resistance": [
+          "81,700（10月29日下跌的起点）"
+        ],
+        "support": [
+          "80,000（整数关口，29日曾短暂跌破）",
+          "79,800（29日低点附近）"
+        ]
+      },
+      "scenarios": [
+        "如果站稳 81,700 上方，等于收复了 29 日的全部跌幅，短线情绪会明显修复。",
+        "如果重新跌破 80,000，可能再触发一轮多头平仓，先看 79,800 一带能否守住。",
+        "两者之间更可能来回震荡，等待美股收盘后的方向。"
+      ],
+      "watch": [
+        "美股周四收盘（北京时间 04:00）时，纳指和谷歌的表现，比特币近期和科技股联动明显。",
+        "市场对 12 月加息的定价有没有变化。"
+      ]
+    },
+    {
+      "asset": "现货黄金",
+      "bias": "偏弱",
+      "horizon": "北京时间 10月30日凌晨至上午",
+      "now": "美国 GDP 和 PCE 都偏强，加息预期和 5% 左右的美债收益率压着金价，29 日晚间跌到 4,026 美元附近。多数技术分析认为短线仍是偏空格局。",
+      "levels": {
+        "resistance": [
+          "4,084–4,146（需持续站上才算扭转短线弱势）"
+        ],
+        "support": [
+          "4,024（当前防守位）",
+          "4,000（整数关口）",
+          "3,986（跌破 4,024 后的下一目标）"
+        ]
+      },
+      "scenarios": [
+        "守住 4,024 和 4,000 的话，更可能在 4,000–4,084 之间震荡。",
+        "有效跌破 4,000，下一步看 3,986 一带，心理关口失守可能放大波动。",
+        "重新站上 4,084，短线偏空的判断才会松动。"
+      ],
+      "watch": [
+        "美元和美债收益率的走向，收益率回落会给金价喘息空间。",
+        "中东局势是否升温，地缘风险是目前金价主要的支撑来源。"
+      ]
+    }
   ]
 }
 </script>
@@ -359,7 +722,7 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
       var w = Math.min(Math.abs(ix.pct) / SCALE, 1) * 50;
       var flag = ix.flag ? '<sup title="' + esc(ix.flag) + '">*</sup>' : '';
       h.push('<div class="row">' +
-        '<div class="name">' + esc(ix.name) + '<small class="num">' + esc(ix.code) + '</small></div>' +
+        '<div class="name">' + esc(ix.name) + '<small class="num">' + esc(ix.code) + (ix.asof ? '　' + esc(ix.asof) : '') + '</small></div>' +
         '<div class="close num">' + fmt(ix.close, ix.close % 1 === 0 && ix.flag ? 0 : 2) + flag + '</div>' +
         '<div class="chg num ' + d + '"><b>' + signed(ix.pct, 2) + '%</b><i>' + (ix.chg === null ? '&nbsp;' : signed(ix.chg, 2)) + '</i></div>' +
         '<div class="bar" role="img" aria-label="' + esc(ix.name) + ' 涨跌幅 ' + signed(ix.pct, 2) + '%"><span class="' + d + '" style="width:' + w.toFixed(1) + '%"></span></div>' +
@@ -378,6 +741,31 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
     m.notes.forEach(function (n) { h.push('<li>' + esc(n) + '</li>'); });
     h.push('</ul></div></section>');
   });
+
+  // 接下来几小时：BTC 与黄金的情景推演
+  if (data.outlook && data.outlook.length) {
+    h.push('<section class="outlook"><h2>接下来几小时</h2><p class="hint">根据当前价格位置、关键价位和已知日程做的情景推演，不是预测。短线走势随机性很大，不构成交易建议。</p>');
+    data.outlook.forEach(function (o) {
+      var bc = /偏强|偏多/.test(o.bias) ? ' up' : /偏弱|偏空/.test(o.bias) ? ' down' : '';
+      h.push('<div class="ol-card"><div class="ol-head"><h3>' + esc(o.asset) + '</h3>' +
+        (o.bias ? '<span class="bias' + bc + '">' + esc(o.bias) + '</span>' : '') +
+        (o.horizon ? '<span class="horizon">' + esc(o.horizon) + '</span>' : '') + '</div>');
+      if (o.now) h.push('<p class="now">' + esc(o.now) + '</p>');
+      if (o.levels) {
+        var li = function (a) { return (a || []).map(function (x) { return '<li class="num">' + esc(x) + '</li>'; }).join(''); };
+        h.push('<div class="levels"><div class="res"><div class="k">上方阻力</div><ul>' + li(o.levels.resistance) + '</ul></div>' +
+          '<div class="sup"><div class="k">下方支撑</div><ul>' + li(o.levels.support) + '</ul></div></div>');
+      }
+      if (o.scenarios && o.scenarios.length) {
+        h.push('<div class="sub-h">可能的情景</div><ul class="plain">' + o.scenarios.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>');
+      }
+      if (o.watch && o.watch.length) {
+        h.push('<div class="sub-h">接下来要看</div><ul class="plain">' + o.watch.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>');
+      }
+      h.push('</div>');
+    });
+    h.push('</section>');
+  }
 
   h.push('<section class="link-box"><h2>两个市场怎么连起来</h2><p>' + esc(data.linkage) + '</p><p class="watch">' + esc(data.watch) + '</p></section>');
 
