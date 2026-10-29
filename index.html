@@ -79,13 +79,33 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
 .news .src { color: var(--muted); font-size: 12px; margin-left: 6px; white-space: nowrap; }
 .news .where { color: var(--muted); font-size: 13px; }
 
+/* 三大块：左右滑动卡片 */
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; margin: 0 0 12px; background: var(--track); border-radius: 10px; }
+.tab { font: inherit; border: 0; background: transparent; color: var(--muted); border-radius: 7px; padding: 7px 4px 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
+.tab .tab-name { font-size: 15px; font-weight: 600; white-space: nowrap; }
+.tab .tab-sub { font-size: 12px; white-space: nowrap; }
+.tab[aria-selected="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.tab:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+.deck { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.deck::-webkit-scrollbar { display: none; }
+.deck > section.mkt { flex: 0 0 100%; min-width: 0; margin: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+.dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0 0; }
+.dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--rule); }
+.dots span.on { background: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .deck { transition: height .25s ease; }
+}
+
 /* 接下来几小时：情景推演 */
-.outlook { margin: 28px 0 0; }
-.outlook h2 { font-size: 18px; margin: 0 0 4px; }
+.mkt .outlook { margin: 0 -18px; padding: 16px 18px 6px; border-top: 1px solid var(--rule); }
+.outlook-solo .outlook { margin: 28px 0 0; }
+.ol-title { font-size: 17px; margin: 0 0 4px; }
+.notes:not(:last-child) { border-radius: 0; }
+.mkt .ol-card { background: var(--note-bg); }
 .outlook .hint { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
 .ol-card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
 .ol-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-.ol-head h3 { margin: 0; font-size: 17px; }
+.ol-head h4 { margin: 0; font-size: 16px; }
 .ol-head .bias { font-size: 12px; border: 1px solid var(--rule); border-radius: 999px; padding: 0 9px; line-height: 20px; }
 .ol-head .bias.up { border-color: var(--up); }
 .ol-head .bias.down { border-color: var(--down); }
@@ -200,6 +220,8 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   :root { --barw: 100%; }
   section.mkt { padding: 16px 14px 6px; }
   .notes { margin: 12px -14px 0; padding: 12px 14px 14px; }
+  .mkt .outlook { margin: 0 -14px; padding: 14px 14px 4px; }
+  .ol-card { padding: 12px 12px; }
   .scale { display: none; }
   .row { grid-template-columns: 1fr auto auto; gap: 6px 14px; }
   .row .bar { grid-column: 1 / -1; height: 6px; }
@@ -713,9 +735,47 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   });
   h.push('</ol>');
 
+  // 三大块（A股 / 美股 / BTC 与黄金）做成左右滑动的卡片，上方标签可点击切换
+  var LEAD = {cn: '上证指数', us: '纳斯达克', alt: '比特币'};
+  var SHORT = {'上证指数': '上证', '纳斯达克': '纳指', '比特币': 'BTC'};
+  function outlookHTML(list) {
+    var o = ['<div class="outlook"><h3 class="ol-title">接下来几小时</h3><p class="hint">根据当前价格位置、关键价位和已知日程做的情景推演，不是预测。短线走势随机性很大，不构成交易建议。</p>'];
+    list.forEach(function (x) {
+      var bc = /偏强|偏多/.test(x.bias) ? ' up' : /偏弱|偏空/.test(x.bias) ? ' down' : '';
+      o.push('<div class="ol-card"><div class="ol-head"><h4>' + esc(x.asset) + '</h4>' +
+        (x.bias ? '<span class="bias' + bc + '">' + esc(x.bias) + '</span>' : '') +
+        (x.horizon ? '<span class="horizon">' + esc(x.horizon) + '</span>' : '') + '</div>');
+      if (x.now) o.push('<p class="now">' + esc(x.now) + '</p>');
+      if (x.levels) {
+        var li = function (a) { return (a || []).map(function (v) { return '<li class="num">' + esc(v) + '</li>'; }).join(''); };
+        o.push('<div class="levels"><div class="res"><div class="k">上方阻力</div><ul>' + li(x.levels.resistance) + '</ul></div>' +
+          '<div class="sup"><div class="k">下方支撑</div><ul>' + li(x.levels.support) + '</ul></div></div>');
+      }
+      if (x.scenarios && x.scenarios.length) {
+        o.push('<div class="sub-h">可能的情景</div><ul class="plain">' + x.scenarios.map(function (v) { return '<li>' + esc(v) + '</li>'; }).join('') + '</ul>');
+      }
+      if (x.watch && x.watch.length) {
+        o.push('<div class="sub-h">接下来要看</div><ul class="plain">' + x.watch.map(function (v) { return '<li>' + esc(v) + '</li>'; }).join('') + '</ul>');
+      }
+      o.push('</div>');
+    });
+    o.push('</div>');
+    return o.join('');
+  }
+  var hasAlt = data.markets.some(function (m) { return m.id === 'alt'; });
+
+  h.push('<div class="tabs" role="tablist" aria-label="切换市场">');
+  data.markets.forEach(function (m, i) {
+    var lead = m.indices.filter(function (ix) { return ix.name === LEAD[m.id]; })[0] || m.indices[0];
+    var sub = lead ? '<span class="tab-sub num ' + dir(lead.pct) + '">' + esc(SHORT[lead.name] || lead.name) + ' ' + signed(lead.pct, 2) + '%</span>' : '';
+    h.push('<button type="button" class="tab" role="tab" id="t-' + m.id + '" aria-controls="p-' + m.id + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' +
+      '<span class="tab-name">' + esc(m.name) + '</span>' + sub + '</button>');
+  });
+  h.push('</div><div class="deck" id="deck">');
+
   data.markets.forEach(function (m) {
-    h.push('<section class="mkt" aria-labelledby="h-' + m.id + '">');
-    h.push('<div class="mkt-head"><h2 id="h-' + m.id + '">' + esc(m.name) + '</h2><span class="when">' + esc(m.when) + '</span></div>');
+    h.push('<section class="mkt" role="tabpanel" id="p-' + m.id + '" aria-labelledby="t-' + m.id + '">');
+    h.push('<div class="mkt-head"><h2>' + esc(m.name) + '</h2><span class="when">' + esc(m.when) + '</span></div>');
     h.push('<div class="scale" aria-hidden="true"><span></span><span class="ticks"><span>−5%</span><span>0</span><span>+5%</span></span></div>');
     m.indices.forEach(function (ix) {
       var d = dir(ix.pct);
@@ -739,33 +799,12 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
     }
     h.push('<div class="notes"><ul>');
     m.notes.forEach(function (n) { h.push('<li>' + esc(n) + '</li>'); });
-    h.push('</ul></div></section>');
-  });
-
-  // 接下来几小时：BTC 与黄金的情景推演
-  if (data.outlook && data.outlook.length) {
-    h.push('<section class="outlook"><h2>接下来几小时</h2><p class="hint">根据当前价格位置、关键价位和已知日程做的情景推演，不是预测。短线走势随机性很大，不构成交易建议。</p>');
-    data.outlook.forEach(function (o) {
-      var bc = /偏强|偏多/.test(o.bias) ? ' up' : /偏弱|偏空/.test(o.bias) ? ' down' : '';
-      h.push('<div class="ol-card"><div class="ol-head"><h3>' + esc(o.asset) + '</h3>' +
-        (o.bias ? '<span class="bias' + bc + '">' + esc(o.bias) + '</span>' : '') +
-        (o.horizon ? '<span class="horizon">' + esc(o.horizon) + '</span>' : '') + '</div>');
-      if (o.now) h.push('<p class="now">' + esc(o.now) + '</p>');
-      if (o.levels) {
-        var li = function (a) { return (a || []).map(function (x) { return '<li class="num">' + esc(x) + '</li>'; }).join(''); };
-        h.push('<div class="levels"><div class="res"><div class="k">上方阻力</div><ul>' + li(o.levels.resistance) + '</ul></div>' +
-          '<div class="sup"><div class="k">下方支撑</div><ul>' + li(o.levels.support) + '</ul></div></div>');
-      }
-      if (o.scenarios && o.scenarios.length) {
-        h.push('<div class="sub-h">可能的情景</div><ul class="plain">' + o.scenarios.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>');
-      }
-      if (o.watch && o.watch.length) {
-        h.push('<div class="sub-h">接下来要看</div><ul class="plain">' + o.watch.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>');
-      }
-      h.push('</div>');
-    });
+    h.push('</ul></div>');
+    if (m.id === 'alt' && data.outlook && data.outlook.length) h.push(outlookHTML(data.outlook));
     h.push('</section>');
-  }
+  });
+  h.push('</div><div class="dots" aria-hidden="true">' + data.markets.map(function (_, i) { return '<span' + (i === 0 ? ' class="on"' : '') + '></span>'; }).join('') + '</div>');
+  if (!hasAlt && data.outlook && data.outlook.length) h.push('<section class="outlook-solo">' + outlookHTML(data.outlook) + '</section>');
 
   h.push('<section class="link-box"><h2>两个市场怎么连起来</h2><p>' + esc(data.linkage) + '</p><p class="watch">' + esc(data.watch) + '</p></section>');
 
@@ -838,7 +877,49 @@ footer ul { margin: 6px 0 12px; padding-left: 1.1em; }
   document.getElementById('app').innerHTML = h.join('');
   document.title = snapId ? '盘后指数 ' + snapLabel(snapId) : '盘后指数';
   window.scrollTo(0, 0);
+  initDeck();
   loadArchive(snapId);
+  }
+
+  function initDeck() {
+    var deck = document.getElementById('deck');
+    if (!deck) return;
+    var slides = Array.prototype.slice.call(deck.children);
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs .tab'));
+    var dots = Array.prototype.slice.call(document.querySelectorAll('.dots span'));
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var cur = -1, raf = 0;
+    function step() { return slides.length > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : deck.clientWidth; }
+    function setActive(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      deck.style.height = slides[i].offsetHeight + 'px';
+      if (i === cur) return;
+      cur = i;
+      tabs.forEach(function (t, k) { t.setAttribute('aria-selected', k === i ? 'true' : 'false'); t.tabIndex = k === i ? 0 : -1; });
+      dots.forEach(function (d, k) { d.className = k === i ? 'on' : ''; });
+    }
+    function go(i, focus) {
+      deck.scrollTo({left: i * step(), behavior: reduce ? 'auto' : 'smooth'});
+      setActive(i);
+      if (focus) tabs[i].focus();
+    }
+    deck.addEventListener('scroll', function () {
+      if (raf) return;
+      raf = requestAnimationFrame(function () { raf = 0; setActive(Math.round(deck.scrollLeft / step())); });
+    }, {passive: true});
+    tabs.forEach(function (t, k) {
+      t.addEventListener('click', function () { go(k); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go((k + 1) % tabs.length, true); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go((k - 1 + tabs.length) % tabs.length, true); }
+      });
+    });
+    window.addEventListener('resize', function () {
+      var i = Math.max(cur, 0); cur = -1;
+      deck.scrollLeft = i * step();
+      setActive(i);
+    });
+    setActive(0);
   }
 
   function snapLabel(id) {
