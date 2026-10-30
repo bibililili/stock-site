@@ -1,0 +1,16 @@
+name: 定时启动行情更新
+on:
+  schedule:
+    - cron: '41 3,8 * * 1-5'   # 北京时间 工作日 11:41、16:41
+  workflow_dispatch:
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 启动 Claude 定时任务
+        run: |
+          curl -fsS -X POST https://api.anthropic.com/v1/claude_code/routines/trig_01REXjTz1wEAPwkL4N871hvY/fire \
+            -H "Authorization: Bearer ${{ secrets.ROUTINE_TOKEN }}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            -d '{}'
